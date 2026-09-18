@@ -45,6 +45,9 @@ function AppointmentForm({ onSubmit, submitting }) {
 
   return (
     <form onSubmit={handleSubmit} className="form">
+    {errors.non_field_errors && (
+        <p className="error">{errors.non_field_errors[0]}</p>
+      )}
       <label>Customer name</label>
       <input
         name="customer_name"
@@ -52,8 +55,7 @@ function AppointmentForm({ onSubmit, submitting }) {
         onChange={handleChange}
         required
       />
-      {errors.customer_name && <p className="error">{errors.customer_name}</p>}
-
+    {errors.customer_name && <p className="error">{errors.customer_name[0]}</p>}
       <label>Customer phone</label>
       <input
         name="customer_phone"

@@ -12,6 +12,7 @@ function AppointmentsPage() {
 
   const sidebarItems = [
     { label: "All Appointments", path: "/appointments" },
+    { label: "New Appointment", path: "/appointments/new" },
     { label: "Pending", path: "/appointments?status=pending" },
     { label: "Confirmed", path: "/appointments?status=confirmed" },
     { label: "Completed", path: "/appointments?status=completed" },
@@ -41,7 +42,13 @@ function AppointmentsPage() {
 
   return (
     <DashboardLayout sidebar={<Sidebar title="Appointments" items={sidebarItems} />}>
-      <h1>Appointments</h1>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <h1>Appointments</h1>
+        <Link to="/appointments/new" className="btn-primary">
+          + New Appointment
+        </Link>
+      </div>
+
       {message && <p className={message.type}>{message.text}</p>}
 
       <table>

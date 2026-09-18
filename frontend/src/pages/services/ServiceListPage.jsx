@@ -53,6 +53,9 @@ function ServiceListPage() {
               <td>NPR {s.price}</td>
               <td>{s.duration} min</td>
               <td>
+                <Link to={`/services/${s.id}/edit`} className="btn-secondary">
+                  Update
+                </Link>
                 <button className="btn-danger" onClick={() => handleDelete(s.id)}>
                   Delete
                 </button>

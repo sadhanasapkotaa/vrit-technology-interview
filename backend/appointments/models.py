@@ -25,11 +25,24 @@ class Appointment(models.Model):
     notes = models.TextField(blank=True, null=True)
     status = models.CharField(max_length=20, choices=Status.choices, default=Status.PENDING,)
 
+    class Meta:
+        ordering = ["-date", "-time"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["service", "date", "time"],
+                condition=models.Q(status__in=["Pending", "Confirmed", "Completed"]),
+                name="unique_active_appointment_slot",
+            )
+        ]
+
+
+
     def __str__(self):
         return f"{self.customer_name} - {self.service.name} on {self.date} {self.time}"
 
 
     def clean(self):
+        # Status trainsition prevention on model level 
         if self.pk:
             previous_status = (Appointment.objects.filter(pk=self.pk).values_list("status", flat=True).first())
 
@@ -44,6 +57,27 @@ class Appointment(models.Model):
                             )
                         }
                     )
+
+        # Double booking prevention on model level
+        if self.service_id and self.date and self.time:
+            conflict_qs = Appointment.objects.filter(
+                service=self.service,
+                date=self.date,
+                time=self.time,
+            ).exclude(status=self.Status.CANCELLED)
+
+            if self.pk:
+                conflict_qs = conflict_qs.exclude(pk=self.pk)
+
+            if conflict_qs.exists():
+                raise ValidationError(
+                    {
+                        "non_field_errors": [
+                            "This service is already booked for the selected date and time."
+                        ]
+                    }
+                )
+
 
     def save(self, *args, **kwargs):
         self.full_clean()
