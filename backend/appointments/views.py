@@ -2,7 +2,7 @@ from django.shortcuts import render
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status as http_status
-
+from django.db.models import Q
 from .models import Appointment
 from .serializers import AppointmentSerializer
 
@@ -14,6 +14,16 @@ def appointment_list(request):
         status_filter = request.query_params.get("status")
         if status_filter:
             appointments = appointments.filter(status__iexact=status_filter)
+        search = request.query_params.get("search")
+        if search:
+            appointments = appointments.filter(
+                Q(customer_name__icontains=search) | Q(customer_phone__icontains=search)
+            )
+
+        date_filter = request.query_params.get("date")
+        if date_filter:
+            appointments = appointments.filter(date=date_filter)
+
         serializer = AppointmentSerializer(appointments, many=True)
         return Response(serializer.data)
 
