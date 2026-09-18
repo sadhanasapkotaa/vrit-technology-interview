@@ -18,3 +18,5 @@ export const updateAppointmentStatus = (id, status) =>
   apiClient.patch(`appointments/${id}/`, { status });
 
 export const deleteAppointment = (id) => apiClient.delete(`appointments/${id}/`);
+
+export const getAppointmentSummary = () => apiClient.get("appointments/summary/");

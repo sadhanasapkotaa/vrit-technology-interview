@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useSearchParams, Link } from "react-router-dom";
 import Sidebar from "../../components/Sidebar";
 import DashboardLayout from "../../layouts/DashboardLayout";
-import { getAppointments, deleteAppointment } from "../../api/appointments";
+import { getAppointments, deleteAppointment, getAppointmentSummary} from "../../api/appointments";
 
 function AppointmentsPage() {
   const [searchParams] = useSearchParams();
@@ -12,7 +12,8 @@ function AppointmentsPage() {
   const [searchInput, setSearchInput] = useState("");
   const [dateFilter, setDateFilter] = useState("");  
   const [appliedSearch, setAppliedSearch] = useState("");
-
+  const [summary, setSummary] = useState({ total_appointments: 0, total_revenue: 0 });
+  
   const sidebarItems = [
     { label: "All Appointments", path: "/appointments" },
     { label: "New Appointment", path: "/appointments/new" },
@@ -28,6 +29,12 @@ function AppointmentsPage() {
       .catch(() => setMessage({ type: "error", text: "Failed to load appointments." }));
   };
 
+  const loadSummary = () => {
+    getAppointmentSummary()
+      .then((res) => setSummary(res.data))
+      .catch(() => {});
+  };
+
   const handleSearch = (e) => {
     e.preventDefault();
     setAppliedSearch(searchInput);
@@ -41,6 +48,7 @@ function AppointmentsPage() {
 
   useEffect(() => {
     loadAppointments();
+    loadSummary();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [statusFilter, appliedSearch, dateFilter]);
 
@@ -58,9 +66,16 @@ function AppointmentsPage() {
     <DashboardLayout sidebar={<Sidebar title="Appointments" items={sidebarItems} />}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <h1>Appointments</h1>
-        <Link to="/appointments/new" className="btn-primary">
-          + New Appointment
-        </Link>
+        <div style={{ display: "flex", gap: "1rem", margin: "1rem 0" }}>
+        <div className="stat-card">
+          <div>Total Appointments</div>
+          <strong>{summary.total_appointments}</strong>
+        </div>
+        <div className="stat-card">
+          <div>Total Revenue</div>
+          <strong>NPR {summary.total_revenue}</strong>
+          </div>
+        </div>
       </div>
 
            <form onSubmit={handleSearch} style={{ display: "flex", gap: "0.5rem", margin: "1rem 0", alignItems: "flex-end" }}>
