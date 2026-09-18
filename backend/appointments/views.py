@@ -2,7 +2,7 @@ from django.shortcuts import render
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status as http_status
-from django.db.models import Q
+from django.db.models import Q, Sum
 from .models import Appointment
 from .serializers import AppointmentSerializer
 
@@ -60,5 +60,13 @@ def appointment_detail(request, pk):
     return Response(status=http_status.HTTP_204_NO_CONTENT)
 
 
-def appointment_page(request):
-    return render(request, "appointments/manage.html")
+@api_view(["GET"])
+def appointment_summary(request):
+    active = Appointment.objects.exclude(status=Appointment.Status.CANCELLED)
+    total_appointments = active.count()
+    total_revenue = active.aggregate(total=Sum("service__price"))["total"] or 0
+
+    return Response({
+        "total_appointments": total_appointments,
+        "total_revenue": total_revenue,
+    })
