@@ -1,10 +1,13 @@
 import apiClient from "./client";
 
-export const getAppointments = (statusFilter = "") => {
-  const url = statusFilter
-    ? `appointments/?status=${encodeURIComponent(statusFilter)}`
-    : "appointments/";
-  return apiClient.get(url);
+export const getAppointments = (statusFilter = "", search = "", dateFilter = "") => {
+  const params = new URLSearchParams();
+  if (statusFilter) params.append("status", statusFilter);
+  if (search) params.append("search", search);
+  if (dateFilter) params.append("date", dateFilter);
+
+  const query = params.toString();
+  return apiClient.get(query ? `appointments/?${query}` : "appointments/");
 };
 
 export const getAppointment = (id) => apiClient.get(`appointments/${id}/`);

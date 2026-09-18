@@ -24,6 +24,14 @@ function ServiceDetailsPage() {
     }
   };
 
+  const handleBackToServices = () => {
+    navigate("/services");
+    };
+
+  const handleEdit = () => {
+    navigate(`/services/${id}/edit`);
+    };
+
   if (!service) return <p>{message ? message.text : "Loading..."}</p>;
 
   return (
@@ -33,6 +41,12 @@ function ServiceDetailsPage() {
       <p>Duration: {service.duration} minutes</p>
       <button className="btn-danger" onClick={handleDelete}>
         Delete Service
+      </button>
+      <button className="btn-secondary" onClick={handleEdit}>
+        Edit Service
+      </button>
+      <button onClick={handleBackToServices}>
+        All Services
       </button>
     </div>
   );

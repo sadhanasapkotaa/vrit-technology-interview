@@ -9,6 +9,9 @@ function AppointmentsPage() {
   const statusFilter = searchParams.get("status") || "";
   const [appointments, setAppointments] = useState([]);
   const [message, setMessage] = useState(null);
+  const [searchInput, setSearchInput] = useState("");
+  const [dateFilter, setDateFilter] = useState("");  
+  const [appliedSearch, setAppliedSearch] = useState("");
 
   const sidebarItems = [
     { label: "All Appointments", path: "/appointments" },
@@ -20,15 +23,26 @@ function AppointmentsPage() {
   ];
 
   const loadAppointments = () => {
-    getAppointments(statusFilter)
+    getAppointments(statusFilter, appliedSearch, dateFilter)
       .then((res) => setAppointments(res.data))
       .catch(() => setMessage({ type: "error", text: "Failed to load appointments." }));
   };
 
+  const handleSearch = (e) => {
+    e.preventDefault();
+    setAppliedSearch(searchInput);
+  };
+
+  const handleClear = () => {
+    setSearchInput("");
+    setDateFilter("");
+    setAppliedSearch("");
+    };
+
   useEffect(() => {
     loadAppointments();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [statusFilter]);
+  }, [statusFilter, appliedSearch, dateFilter]);
 
   const handleDelete = async (id) => {
     if (!window.confirm(`Delete appointment #${id}?`)) return;
@@ -48,6 +62,30 @@ function AppointmentsPage() {
           + New Appointment
         </Link>
       </div>
+
+           <form onSubmit={handleSearch} style={{ display: "flex", gap: "0.5rem", margin: "1rem 0", alignItems: "flex-end" }}>
+        <div>
+          <label>Search by name or phone</label>
+          <input
+            type="text"
+            placeholder="e.g. Ram or 9812345678"
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
+          />
+        </div>
+        <button type="submit" className="btn-secondary">Search</button>
+
+        <div>
+          <label>Filter by date</label>
+          <input
+            type="date"
+            value={dateFilter}
+            onChange={(e) => setDateFilter(e.target.value)}
+          />
+        </div>
+
+        <button type="button" className="btn-secondary" onClick={handleClear}>Clear</button>
+      </form>
 
       {message && <p className={message.type}>{message.text}</p>}
 
